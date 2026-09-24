@@ -1,0 +1,41 @@
+<p>customer works!</p>
+
+<table border="1">
+    <thead>
+        <tr>
+            <td>Ma Loai KH</td>
+            <td colspan="4">Ten Loai Khach Hang</td>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Vòng lặp 1: Duyệt từng nhóm khách hàng -->
+        @for (group of customerGroups; track group.CustomerTypeId) {
+            <tr>
+                <td>{{ group.CustomerTypeId }}</td>
+                <td colspan="4">{{ group.CustomerTypeName }}</td>
+            </tr>
+
+            <!-- Hàng tiêu đề các cột của khách hàng -->
+            <tr>
+                <td>Ma Khach Hang</td>
+                <td>Ten Khach Hang</td>
+                <td>Email</td>
+                <td>Tuoi</td>
+                <td>Picture</td>
+            </tr>
+
+            <!-- Vòng lặp 2: Duyệt danh sách khách hàng thuộc nhóm -->
+            @for (cus of group.Customers; track cus.Id) {
+                <tr>
+                    <td>{{ cus.Id }}</td>
+                    <td>{{ cus.Name }}</td>
+                    <td>{{ cus.Email }}</td>
+                    <td>{{ cus.Age }}</td>
+                    <td>
+                        <img [src]="cus.Image" [alt]="cus.Name" width="100" height="100">
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

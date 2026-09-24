@@ -1,0 +1,13 @@
+<p>bindig-property-component works!</p>
+<table border="1">
+    <tr>
+        <td>Name:</td>
+        <input type="text" [value]="name" [disabled]=""isDisabled>
+    </tr>
+     <tr>
+        <td>Email:</td>
+        <td>
+        <input type="text" [value]="email" disabled={{isDisabled}}>
+        </td>
+    </tr>
+</table>

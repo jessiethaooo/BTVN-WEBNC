@@ -1,0 +1,28 @@
+<table border="1" cellPadding="8" style="border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th>Ma San Pham</th>
+      <th>Ten San Pham</th>
+      <th>Gia San Pham</th>
+      <th>Picture</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (p of products; track p.id) {
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.price }}</td>
+        <td>
+          <img [src]="p.image" width="70" height="90" style="object-fit: contain;" />
+        </td>
+        <td>
+          <a style="cursor:pointer; color: blue; text-decoration: underline;" (click)="viewDetail(p)">
+            Details
+          </a>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

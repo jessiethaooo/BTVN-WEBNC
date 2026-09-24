@@ -1,0 +1,35 @@
+<table border="1">
+    <tr>
+        <!-- Sửa lại tiêu đề cho đúng với 3 hệ số và hàm giaiPtb2 -->
+        <td colspan="2">Phuong trinh bac 2</td>
+    </tr>
+    <tr>
+        <td>He so a:</td>
+        <td>
+            <input type="number" [(ngModel)]="hsa"/>
+        </td>
+    </tr>
+    <tr>
+        <td>He so b:</td>
+        <td>
+            <input type="number" [(ngModel)]="hsb"/>
+        </td>
+    </tr>
+    <tr>
+        <td>He so c:</td>
+        <td>
+            <input type="number" [(ngModel)]="hsc"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Ket qua:</td>
+        <td [innerHTML]="result"></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <button type="button" (click)="giaiPtb2()">Giai</button>
+            <!-- Bổ sung (click)="ptMoi()" để xóa dữ liệu -->
+            <button type="button" (click)="ptMoi()">PT Moi</button>
+        </td>
+    </tr>
+</table>

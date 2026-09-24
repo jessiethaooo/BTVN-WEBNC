@@ -1,0 +1,40 @@
+<p>product-list-component works!</p>
+<table border="1">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Price</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let product of products">
+            <td> {{product.id}}</td>
+            <td> {{product.name}}</td>
+            <td> {{product.price}}</td>
+        </tr>
+    </tbody>
+</table>
+<div>
+    Cách 2
+<table border="1">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Price</td>
+        </tr>
+    </thead>
+    <tbody>
+       @for (product of products; track $index){
+       <tr> 
+       
+            <td> {{product.id}}</td>
+            <td> {{product.name}}</td>
+            <td> {{product.price}}</td>
+            <td><img [src]="product.image" [alt]="product.name" width="100" height="100"></td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>

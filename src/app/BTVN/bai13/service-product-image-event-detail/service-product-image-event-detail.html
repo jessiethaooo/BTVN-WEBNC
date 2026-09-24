@@ -1,0 +1,26 @@
+<h3>Chi tiết sản phẩm</h3>
+<button (click)="goBack()">Go Back</button>
+
+@if (selectedProduct) {
+  <div style="margin-top: 15px;">
+    <table border="1" cellPadding="8">
+      <tr>
+        <td><b>ID:</b></td>
+        <td>{{ selectedProduct.id }}</td>
+      </tr>
+      <tr>
+        <td><b>Tên SP:</b></td>
+        <td>{{ selectedProduct.name }}</td>
+      </tr>
+      <tr>
+        <td><b>Giá:</b></td>
+        <td>{{ selectedProduct.price }}</td>
+      </tr>
+      <tr>
+        <td colspan="2" align="center">
+          <img [src]="selectedProduct.image" width="200" />
+        </td>
+      </tr>
+    </table>
+  </div>
+}
