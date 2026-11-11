@@ -1,0 +1,10 @@
+[
+        { "id": 1, "name": "Iphone 18", "price": 100, "image": "https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/42/370982/iphone-18-pro-max-do-burgundy-1-639246098159595347.jpg" },
+        { "id": 2, "name": "Samung", "price": -50, "image": "https://cdn.tgdd.vn/Products/Images/42/368057/samsung-galaxy-z-fold8-kem-thumb-600x600.jpg" },
+        { "id": 3, "name": "Macbook", "price": 300, "image": "https://cdn.tgdd.vn/Products/Images/44/363488/macbook-pro-14-inch-m5-pro-24gb-1tb-den-1-600x600.jpg" },
+        { "id": 4, "name": "Asus", "price": -2, "image": "https://cdn.tgdd.vn/2026/09/timerseo/362621-600x600-3.png" },
+        { "id": 5, "name": "iPad Pro", "price": 500, "image": "https://cdn.tgdd.vn/Products/Images/522/358082/ipad-pro-m5-wifi-11-inch-black-thumb-600x600.jpg" },
+        { "id": 5, "name": "Thuốc viêm họng", "price": 500, "image": "https://cdn.tgdd.vn/Products/Images/522/358082/ipad-pro-m5-wifi-11-inch-black-thumb-600x600.jpg" }, 
+        { "id": 5, "name": "Thuốc trị sự phản bội", "price": 500, "image": "https://cdn.tgdd.vn/Products/Images/522/358082/ipad-pro-m5-wifi-11-inch-black-thumb-600x600.jpg" }
+
+]
