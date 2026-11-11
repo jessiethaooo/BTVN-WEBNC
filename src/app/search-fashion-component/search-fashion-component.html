@@ -1,0 +1,112 @@
+<div class="container py-4">
+  <!-- Card Tìm kiếm & Cấu hình -->
+  <div class="card shadow-sm border-0 mb-4 rounded-3">
+    <div class="card-header bg-primary text-white py-3 rounded-top-3">
+      <h4 class="mb-0 fw-bold"><i class="bi bi-search me-2"></i>Hệ Thống Tìm Kiếm Thời Trang (SearchFashion)</h4>
+    </div>
+    <div class="card-body p-4 bg-light">
+      <div class="row g-3">
+        <!-- Ô nhập dữ liệu tìm kiếm -->
+        <div class="col-md-12">
+          <label class="form-label fw-bold">Từ khóa tìm kiếm:</label>
+          <div class="input-group input-group-lg">
+            <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="searchTerm" 
+              (input)="onSearch()" 
+              placeholder="Nhập từ khóa (ví dụ: Vintage, Denim, Streetwear, Jacket...)" 
+            />
+          </div>
+        </div>
+
+        <!-- Chọn trường tìm kiếm -->
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Tìm kiếm theo:</label>
+          <select class="form-select" [(ngModel)]="searchTarget" (change)="onSearch()">
+            <option value="both">Cả Subject & Detail</option>
+            <option value="subject">fashion_subject</option>
+            <option value="detail">fashion_detail</option>
+          </select>
+        </div>
+
+        <!-- Chọn độ đo Similarity -->
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Thuật toán độ đo (Similarity):</label>
+          <select class="form-select" [(ngModel)]="selectedMetric" (change)="onSearch()">
+            <option value="cosine">Cosine Similarity</option>
+            <option value="jaccard">Jaccard Similarity</option>
+          </select>
+        </div>
+
+        <!-- Chọn số lượng kết quả hiển thị -->
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Số lượng hiển thị:</label>
+          <select class="form-select" [(ngModel)]="displayLimit" (change)="onSearch()">
+            <option [ngValue]="5">5 kết quả</option>
+            <option [ngValue]="10">10 kết quả</option>
+            <option [ngValue]="20">20 kết quả</option>
+            <option [ngValue]="100">Tất cả</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chú thích quy tắc màu sắc (Legend) -->
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+      <span class="fw-bold me-3">Chú thích độ tương đồng:</span>
+      <span class="badge badge-legend me-2 legend-high">[0.75 ➔ 1.0]: Nền Vàng + Chữ Đỏ</span>
+      <span class="badge badge-legend me-2 legend-medium">[0.5 ➔ 0.75): Nền Hồng + Chữ Xanh</span>
+      <span class="badge badge-legend legend-low">&lt; 0.5: Nền Đỏ + Chữ Trắng</span>
+    </div>
+  </div>
+
+  <!-- Bảng hiển thị danh sách Fashion tìm thấy -->
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-dark text-center">
+            <tr>
+              <th style="width: 80px;">ID</th>
+              <th style="width: 100px;">Hình ảnh</th>
+              <th style="width: 140px;">Style</th>
+              <th>Fashion Subject</th>
+              <th>Fashion Detail</th>
+              <th style="width: 180px;">
+                {{ selectedMetric === 'cosine' ? 'Cosine Similarity' : 'Jaccard Similarity' }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr 
+              *ngFor="let item of displayedList" 
+              [ngClass]="getScoreClass(item.similarity)"
+              class="text-center font-monospace-score"
+            >
+              <td class="fw-bold">{{ item.id }}</td>
+              <td>
+                <img [src]="item.image" [alt]="item.style" class="fashion-img rounded shadow-sm" />
+              </td>
+              <td class="fw-bold">{{ item.style }}</td>
+              <td class="text-start">{{ item.fashion_subject }}</td>
+              <td class="text-start">{{ item.fashion_detail }}</td>
+              <td class="fw-bold fs-5">
+                {{ (item.similarity * 100) | number:'1.2-2' }}%
+                <div class="fs-6 fw-normal">({{ item.similarity | number:'1.4-4' }})</div>
+              </td>
+            </tr>
+            <tr *ngIf="displayedList.length === 0">
+              <td colspan="6" class="text-center py-4 text-muted fs-5">
+                Không tìm thấy sản phẩm thời trang phù hợp!
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

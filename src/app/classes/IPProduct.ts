@@ -1,5 +1,5 @@
 export interface IPProduct {
-  id?: string |number;
+  id: number; 
   name: string;
   price: number;
   image: string; 

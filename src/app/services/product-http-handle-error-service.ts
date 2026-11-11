@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, retry, throwError } from 'rxjs';
+import { Observable, catchError, map, retry, throwError } from 'rxjs';
 import { IPProduct } from '../classes/IPProduct';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductHttpHandleErrorService {
-    private _url:string="/datasets/products.json"
+    private _url:string="/dataset/products.json"
     constructor(private _http: HttpClient) { }
 
   getProductsList(): Observable<IPProduct[]> {
@@ -21,5 +21,11 @@ export class ProductHttpHandleErrorService {
   {
     return throwError(()=> new Error(error.message))
   }
+  getProductById(id: number): Observable<IPProduct | undefined> {
+    return this.getProductsList().pipe(
+      map((products: IPProduct[]) => products.find(p => p.id === id)),
+      catchError(this.handleError)
+    );
+  }
 }
 

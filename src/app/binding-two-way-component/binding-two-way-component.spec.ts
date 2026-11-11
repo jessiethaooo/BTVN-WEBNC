@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { BindingTwoWayComponent } from './binding-two-way-component';
 
 describe('BindingTwoWayComponent', () => {
@@ -8,6 +9,7 @@ describe('BindingTwoWayComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [BindingTwoWayComponent],
+      imports: [FormsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BindingTwoWayComponent);

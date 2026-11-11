@@ -12,7 +12,11 @@
        <tr> 
        
             <td> {{product.id}}</td>
-            <td> {{product.name}}</td>
+            <td>
+                <a [routerLink]="['/product', product.id]">
+    {{product.name}}
+</a>
+            </td>
             <td> {{product.price}}</td>
             <td><img [src]="product.image" [alt]="product.name" width="100" height="100"></td>
         </tr>

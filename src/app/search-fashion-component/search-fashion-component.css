@@ -1,0 +1,43 @@
+/* Kích thước ảnh sản phẩm */
+.fashion-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+/* Badge chú thích */
+.badge-legend {
+  font-size: 0.85rem;
+  padding: 0.5em 0.8em;
+  border-radius: 6px;
+}
+
+/* ===================================================
+   SỬA LỖI ĐÈ MÀU BOOTSTRAP 5 CHO CÁC DÒNG TRONG BẢNG
+   =================================================== */
+
+/* 1. Mức [0.75 -> 1.0]: Tô nền VÀNG + chữ ĐỎ */
+tr.score-high > td, .legend-high {
+  background-color: #ffff00 !important; /* Nền Vàng */
+  color: #cc0000 !important;            /* Chữ Đỏ */
+  font-weight: 700 !important;
+}
+
+/* 2. Mức [0.5 -> 0.75): Tô nền HỒNG + chữ XANH */
+tr.score-medium > td, .legend-medium {
+  background-color: #ffc0cb !important; /* Nền Hồng */
+  color: #0000cc !important;            /* Chữ Xanh */
+  font-weight: 700 !important;
+}
+
+/* 3. Mức dưới < 0.5: Tô nền ĐỎ + chữ TRẮNG */
+tr.score-low > td, .legend-low {
+  background-color: #d32f2f !important; /* Nền Đỏ */
+  color: #ffffff !important;            /* Chữ Trắng */
+  font-weight: 600 !important;
+}
+
+/* Giữ đường viền mỏng giữa các dòng cho đẹp */
+tbody tr td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;
+}
