@@ -1,61 +1,57 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, retry, throwError } from 'rxjs';
+import { catchError, Observable, retry, throwError } from 'rxjs';
 import { Fashion } from '../classes/Fashion';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FashionAPIService {
-    headers=new HttpHeaders().set("Content-Type","text/plain;charset=utf-8")
-    requestOptions:Object={
-        headers:this.headers,
-        responseType:"text"
-      }
     constructor(private _http: HttpClient) { }
-    getFashions():Observable<any>
+    getFashions():Observable<Fashion[]>
     {
-      return this._http.get<any>("/fashions",this.requestOptions).pipe(
-          map(res=>JSON.parse(res) as Array<Fashion>),
+      return this._http.get<Fashion[]>("/fashions").pipe(
           retry(3),
           catchError(this.handleError))
     }
     handleError(error:HttpErrorResponse){
-      return throwError(()=>new Error(error.message))
+      const message = error.error?.message || error.message;
+      return throwError(()=>new Error(message))
     }
-    getFashion(id:string):Observable<any>
+    getFashion(id:string):Observable<Fashion>
     {
-      return this._http.get<any>("/fashions/"+id,this.requestOptions).pipe(
-          map(res=>JSON.parse(res) as Fashion),
+      return this._http.get<Fashion>("/fashions/"+id).pipe(
           retry(3),
           catchError(this.handleError))
     }
-    postFashion(aFashion:any):Observable<any>
+    getFashionByIdF(id: number):Observable<Fashion>
+    {
+      return this._http.get<Fashion>("/fashions/idf/"+id).pipe(
+          retry(3),
+          catchError(this.handleError))
+    }
+    getFashionBySlug(slug:string):Observable<Fashion>
+    {
+      return this._http.get<Fashion>("/fashions/slug/"+encodeURIComponent(slug)).pipe(
+          retry(3),
+          catchError(this.handleError))
+    }
+    postFashion(aFashion:Fashion):Observable<Fashion>
     {
-      let jsonString=JSON.stringify(aFashion)
-      return this._http.post<any>("/fashions",jsonString,this.requestOptions).pipe(
-          map(res=>JSON.parse(res) as Fashion),
-          retry(3),
+      return this._http.post<Fashion>("/fashions",aFashion).pipe(
           catchError(this.handleError))
     }
-    putFashion(aFashion:any):Observable<any>
+    putFashion(aFashion:Fashion):Observable<Fashion>
     {
-      let jsonString=JSON.stringify(aFashion)
-      return this._http.put<any>("/fashions",jsonString,this.requestOptions).pipe(
-          map(res=>JSON.parse(res) as Fashion),
-          retry(3),
+      return this._http.put<Fashion>("/fashions",aFashion).pipe(
           catchError(this.handleError))
     }
-    deleteFashion(fashionId:string):Observable<any>
+    deleteFashion(fashionId:string):Observable<Fashion>
     {
-      return this._http.delete<any>("/fashions/"+fashionId,this.requestOptions).pipe(
-          map(res=>JSON.parse(res) as Fashion),
-          retry(3),
+      return this._http.delete<Fashion>("/fashions/"+fashionId).pipe(
           catchError(this.handleError))
     }
 
 
 
 }
-
-

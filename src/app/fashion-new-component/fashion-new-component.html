@@ -36,7 +36,9 @@
     </tr>
      <tr>
         <td colspan="2">
-            <button (click)="postFashion()">Submit</button>
+            <button [disabled]="isSubmitting || isSaved" (click)="postFashion()">
+              {{ isSubmitting ? 'Đang lưu...' : isSaved ? 'Đã lưu thành công' : 'Submit' }}
+            </button>
         </td>
     </tr>
 </table>
@@ -62,4 +64,3 @@
   }
 </table>
 
-

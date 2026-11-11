@@ -1,26 +1,67 @@
-<p>{{errMessage()}}</p>
-Fashion Id: <input type="text" #fashionId> 
-<button (click)="searchFashion(fashionId.value)">Search</button>
-<table>
-  @if (fashion()!=null){
-    <tr>
-        <td>Fashion Id:</td>
-        <td>{{fashion()?._id}}</td>
-    </tr>
-    <tr>
-        <td>Fashion Subject:</td>
-        <td>{{fashion()?.fashion_subject}}</td>
-    </tr>
-    <tr>
-        <td>Fashion Detail:</td>
-        <td>{{fashion()?.fashion_detail}} </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <img src="{{fashion()?.getBase64String()}}">
-        </td>
-    </tr>
-  }@else {
-    <tr><td>Not found Fashion</td></tr>
-  }
-</table>
+<nav class="navbar navbar-expand-lg detail-navbar shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-uppercase" routerLink="/fashion-list">
+      <span class="brand-mark">✦</span> FASHION JOURNAL
+    </a>
+    <button class="btn btn-outline-light btn-sm" type="button" (click)="goToList()">
+      ← Danh sách
+    </button>
+  </div>
+</nav>
+
+<main class="detail-page">
+  <div class="container py-5">
+    @if (isLookupMode()) {
+      <section class="lookup-card mb-4">
+        <p class="eyebrow mb-2">FASHION ARCHIVE</p>
+        <h1 class="h3 fw-bold mb-3">Tra cứu bài viết</h1>
+        <div class="input-group">
+          <input
+            #fashionId
+            class="form-control"
+            type="text"
+            placeholder="Nhập IdF (ví dụ: 2)"
+            aria-label="IdF của Fashion"
+            (keyup.enter)="searchFashion(fashionId.value)"
+          />
+          <button class="btn btn-primary px-4" type="button" (click)="searchFashion(fashionId.value)">
+            Tra cứu
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (loading()) {
+      <section class="message-card">Đang tải chi tiết Fashion...</section>
+    } @else if (errMessage()) {
+      <section class="message-card error-card">
+        <h2 class="h5 fw-bold">Không tìm thấy Fashion</h2>
+        <p class="mb-0">{{ errMessage() }}</p>
+      </section>
+    } @else if (fashion(); as item) {
+      <article class="fashion-detail-card">
+        <div class="fashion-image-panel">
+          <img
+            [src]="item.fashion_image || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&auto=format&fit=crop&q=80'"
+            [alt]="item.fashion_subject"
+          />
+          <span class="image-label">{{ item.style || 'FASHION' }}</span>
+        </div>
+        <div class="fashion-copy">
+          <p class="eyebrow">FASHION STORY · ID {{ item.IdF }}</p>
+          <h1>{{ item.fashion_subject }}</h1>
+          <p class="slug-label">/{{ item.slug }}</p>
+          <div class="copy-divider"></div>
+          <p class="fashion-description">{{ item.fashion_detail }}</p>
+          <button class="btn btn-dark mt-3" type="button" (click)="goToList()">
+            Khám phá bộ sưu tập
+          </button>
+        </div>
+      </article>
+    } @else {
+      <section class="message-card">
+        Chọn một Fashion trong danh sách hoặc nhập IdF để xem chi tiết.
+      </section>
+    }
+  </div>
+</main>

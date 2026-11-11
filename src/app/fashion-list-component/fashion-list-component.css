@@ -91,7 +91,7 @@
 }
 
 .table-row-hover:hover {
-  background-color: #f1f5f9 / 50%;
+  background-color: rgba(241, 245, 249, 0.7);
   transition: background-color 0.2s ease;
 }
 
@@ -125,6 +125,31 @@
   display: inline-block;
   letter-spacing: 0.5px;
   border: 1px solid #bae6fd;
+}
+
+.id-badge {
+  display: inline-flex;
+  min-width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-weight: 700;
+}
+
+.fashion-slug {
+  color: #1d4ed8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.fashion-slug:hover {
+  color: #0f172a;
+  text-decoration: underline;
 }
 
 /* Xử lý hiển thị nội dung WYSIWYG gọn gàng */

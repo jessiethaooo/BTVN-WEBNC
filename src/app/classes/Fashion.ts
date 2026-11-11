@@ -1,4 +1,7 @@
 export class Fashion{
+    public IdF:number=0;
+    public slug:string="";
+
     constructor(
         public _id:any=null,
         public style:string="",

@@ -11,6 +11,8 @@ import { FashionAPIService } from '../services/fashion-apiservice';
 export class FashionNewComponent {
   fashion=new Fashion();
   errMessage:string=''
+  isSubmitting=false;
+  isSaved=false;
   constructor(private _service: FashionAPIService){
   }
   onFileSelected(event:any,fashion:Fashion) {
@@ -26,11 +28,22 @@ export class FashionNewComponent {
   }
   postFashion()
   {
+    if (this.isSubmitting || this.isSaved) {
+      return;
+    }
+    this.isSubmitting=true;
+    this.errMessage='';
     this._service.postFashion(this.fashion).subscribe({
-      next:(data)=>{this.fashion=data},
-      error:(err)=>{this.errMessage=err}
+      next:(data)=>{
+        this.fashion=data;
+        this.isSaved=true;
+        this.isSubmitting=false;
+      },
+      error:(err)=>{
+        this.errMessage=err.message || 'Không thể lưu Fashion.';
+        this.isSubmitting=false;
+      }
     })
   }
 }
-
 

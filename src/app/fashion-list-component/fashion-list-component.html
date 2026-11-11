@@ -17,7 +17,7 @@
   <div class="glass-card p-4 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
     <div>
       <h3 class="fw-bold mb-1 gradient-text">Quản Lý Danh Sách Thời Trang</h3>
-      <p class="text-muted mb-0 fs-6">Bài 58 - Hệ thống quản trị bài viết & sản phẩm</p>
+      <p class="text-muted mb-0 fs-6">Khám phá phong cách và bộ sưu tập mới nhất</p>
     </div>
     <button class="btn btn-add-custom shadow-sm" (click)="onAdd()">
       <i class="bi bi-plus-lg me-1"></i> + Thêm Mới Fashion
@@ -30,30 +30,42 @@
       <thead>
         <tr>
           <th class="text-center" style="width: 110px;">Hình Ảnh</th>
+          <th class="text-center" style="width: 90px;">IdF</th>
           <th style="width: 240px;">Tiêu Đề (Subject)</th>
+          <th style="width: 190px;">Slug</th>
           <th class="text-center" style="width: 140px;">Style</th>
           <th>Nội Dung Chi Tiết (Detail)</th>
           <th class="text-center" style="width: 160px;">Thao Tác</th>
         </tr>
       </thead>
       <tbody>
-        @for (item of fashions; track item._id) {
+        @for (item of fashions(); track item._id) {
           <tr class="table-row-hover">
             <!-- Hình ảnh với hiệu ứng Zoom -->
             <td class="text-center py-3">
               <div class="img-wrapper mx-auto">
                 <img 
-                  [src]="item.thumbnail || item.fashion_image || 'https://www.phucanh.vn/media/news/0904_xemJujutsuKaisenSeason34.jpg'" 
+                  [src]="item.fashion_image || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&auto=format&fit=crop&q=80'" 
                   class="img-fluid rounded-3 shadow-sm"
                   alt="Fashion Thumbnail"
                 />
               </div>
             </td>
 
+            <td class="text-center">
+              <span class="id-badge">{{ item.IdF }}</span>
+            </td>
+
             <!-- Tiêu đề -->
             <td>
               <div class="fw-bold text-dark fs-6">{{ item.fashion_subject }}</div>
-              <small class="text-muted">ID: {{ item._id }}</small>
+              <small class="text-muted">Mongo ID: {{ item._id }}</small>
+            </td>
+
+            <td>
+              <a class="fashion-slug" [routerLink]="['/fashion-detail', getSlug(item)]">
+                {{ getSlug(item) }}
+              </a>
             </td>
 
             <!-- Style Badge -->
@@ -80,9 +92,15 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="text-center py-5 text-muted">
-              <div class="fs-4 mb-2">📂</div>
-              <p class="mb-0">Chưa có dữ liệu Fashion nào trong cơ sở dữ liệu.</p>
+            <td colspan="7" class="text-center py-5 text-muted">
+              @if (loading()) {
+                <p class="mb-0">Đang tải bộ sưu tập...</p>
+              } @else if (errorMessage()) {
+                <p class="mb-0 text-danger">{{ errorMessage() }}</p>
+              } @else {
+                <div class="fs-4 mb-2">📂</div>
+                <p class="mb-0">Chưa có dữ liệu Fashion nào trong cơ sở dữ liệu.</p>
+              }
             </td>
           </tr>
         }

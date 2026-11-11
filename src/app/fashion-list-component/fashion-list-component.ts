@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { Fashion } from '../classes/Fashion';
+import { createSlug } from '../classes/slug-helper';
+import { FashionAPIService } from '../services/fashion-apiservice';
 
 @Component({
   selector: 'app-fashion-list-component',
@@ -9,13 +11,12 @@ import { Router } from '@angular/router';
   templateUrl: './fashion-list-component.html',
 })
 export class FashionListComponent implements OnInit {
-  fashions: any[] = [];
-  
-  // Đổi port theo backend của bạn (http://localhost:4000/fashions hoặc http://localhost:3002/fashions)
-  private apiUrl = 'http://localhost:4000/fashions';
+  fashions = signal<Fashion[]>([]);
+  loading = signal(false);
+  errorMessage = signal('');
 
   constructor(
-    private http: HttpClient,
+    private fashionService: FashionAPIService,
     private router: Router
   ) {}
 
@@ -25,14 +26,26 @@ export class FashionListComponent implements OnInit {
 
   // 1. Tải danh sách Fashion từ backend
   loadFashions(): void {
-    this.http.get<any[]>(this.apiUrl).subscribe({
+    this.loading.set(true);
+    this.errorMessage.set('');
+    this.fashionService.getFashions().subscribe({
       next: (data) => {
-        this.fashions = data;
+        this.fashions.set(data);
+        this.loading.set(false);
       },
       error: (err) => {
-        console.error('Lỗi tải danh sách:', err);
+        this.errorMessage.set(err.message || 'Không thể tải danh sách Fashion.');
+        this.loading.set(false);
       }
     });
+  }
+
+  getSlug(fashion: Fashion): string {
+    return fashion.slug || createSlug(fashion.fashion_subject, fashion.IdF);
+  }
+
+  viewDetail(slug: string): void {
+    this.router.navigate(['/fashion-detail', slug]);
   }
 
   // 2. Chuyển sang màn hình Thêm mới
@@ -48,14 +61,13 @@ export class FashionListComponent implements OnInit {
   // 4. Xóa bài viết (có xác nhận confirm)
   onDelete(id: string): void {
     if (confirm('Bạn có chắc chắn muốn xóa bài Fashion này không?')) {
-      this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+      this.fashionService.deleteFashion(id).subscribe({
         next: () => {
           alert('Xóa thành công!');
           this.loadFashions(); // Cập nhật lại danh sách sau khi xóa
         },
         error: (err) => {
-          alert('Lỗi khi xóa dữ liệu!');
-          console.error(err);
+          this.errorMessage.set(err.message || 'Lỗi khi xóa dữ liệu.');
         }
       });
     }
