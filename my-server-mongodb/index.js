@@ -62,20 +62,68 @@ app.use(session({
 // 3. KẾT NỐI MONGODB
 // -------------------------------------------------------------
 const client = new MongoClient("mongodb://127.0.0.1:27017");
-let database, fashionCollection, UserCollection;
+let database, fashionCollection, fashionCounterCollection, UserCollection;
+
+function createFashionSlug(subject, IdF) {
+    const slugSubject = (subject || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "") || "fashion";
+    return `${slugSubject}-p${IdF}`;
+}
+
+async function prepareFashionCollection() {
+    const fashions = await fashionCollection.find(
+        {},
+        { projection: { IdF: 1, slug: 1, fashion_subject: 1 } }
+    ).sort({ _id: 1 }).toArray();
+    const usedIds = new Set();
+    const validIds = new Set(
+        fashions
+            .map(fashion => fashion.IdF)
+            .filter(IdF => Number.isSafeInteger(IdF) && IdF > 0)
+    );
+    let nextIdF = [...validIds].reduce((max, IdF) => Math.max(max, IdF), 0);
+
+    for (const fashion of fashions) {
+        let IdF = fashion.IdF;
+        if (!Number.isSafeInteger(IdF) || IdF < 1 || usedIds.has(IdF)) {
+            do {
+                nextIdF += 1;
+                IdF = nextIdF;
+            } while (validIds.has(IdF) || usedIds.has(IdF));
+        }
+        usedIds.add(IdF);
+
+        const slug = createFashionSlug(fashion.fashion_subject, IdF);
+        if (fashion.IdF !== IdF || fashion.slug !== slug) {
+            await fashionCollection.updateOne(
+                { _id: fashion._id },
+                { $set: { IdF, slug } }
+            );
+        }
+    }
+
+    await fashionCollection.createIndex({ IdF: 1 }, { unique: true });
+    await fashionCollection.createIndex({ slug: 1 }, { unique: true });
+    await fashionCounterCollection.updateOne(
+        { _id: "fashionIdF" },
+        { $max: { sequence_value: nextIdF } },
+        { upsert: true }
+    );
+}
 
 async function initDB() {
-    try {
-        await client.connect();
-        database = client.db("FashionData");
-        fashionCollection = database.collection("Fashion");
-        UserCollection = database.collection("User");
-        console.log("Đã kết nối MongoDB thành công!");
-    } catch (err) {
-        console.error("Lỗi kết nối MongoDB:", err);
-    }
+    await client.connect();
+    database = client.db("FashionData");
+    fashionCollection = database.collection("Fashion");
+    fashionCounterCollection = database.collection("Counters");
+    UserCollection = database.collection("User");
+    await prepareFashionCollection();
+    console.log("Đã kết nối MongoDB thành công!");
 }
-initDB();
 
 // -------------------------------------------------------------
 // 4. API ROUTES
@@ -94,10 +142,42 @@ app.get("/fashions", async (req, res) => {
     }
 });
 
+app.get("/fashions/slug/:slug", async (req, res) => {
+    try {
+        const result = await fashionCollection.findOne({ slug: req.params.slug });
+        if (!result) {
+            return res.status(404).send({ message: "Không tìm thấy Fashion!" });
+        }
+        res.send(result);
+    } catch (err) {
+        res.status(500).send({ message: "Lỗi truy vấn chi tiết!", error: err.message });
+    }
+});
+
+app.get("/fashions/idf/:IdF", async (req, res) => {
+    const IdF = Number(req.params.IdF);
+    if (!Number.isSafeInteger(IdF) || IdF < 1) {
+        return res.status(400).send({ message: "IdF phải là số nguyên dương!" });
+    }
+
+    try {
+        const result = await fashionCollection.findOne({ IdF });
+        if (!result) {
+            return res.status(404).send({ message: "Không tìm thấy Fashion với IdF này!" });
+        }
+        res.send(result);
+    } catch (err) {
+        res.status(500).send({ message: "Lỗi truy vấn chi tiết!", error: err.message });
+    }
+});
+
 app.get("/fashions/:id", async (req, res) => {
     try {
         const o_id = new ObjectId(req.params.id);
         const result = await fashionCollection.findOne({ _id: o_id });
+        if (!result) {
+            return res.status(404).send({ message: "Không tìm thấy Fashion!" });
+        }
         res.send(result);
     } catch (err) {
         res.status(400).send({ message: "ID không hợp lệ!", error: err.message });
@@ -106,8 +186,25 @@ app.get("/fashions/:id", async (req, res) => {
 
 app.post("/fashions", async (req, res) => {
     try {
-        await fashionCollection.insertOne(req.body);
-        res.send(req.body);
+        if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+            return res.status(400).send({ message: "Dữ liệu Fashion không hợp lệ!" });
+        }
+        const counter = await fashionCounterCollection.findOneAndUpdate(
+            { _id: "fashionIdF" },
+            { $inc: { sequence_value: 1 } },
+            { upsert: true, returnDocument: "after" }
+        );
+        const IdF = counter.sequence_value;
+        const fashion = {
+            style: req.body.style || "",
+            fashion_subject: req.body.fashion_subject || "",
+            fashion_detail: req.body.fashion_detail || "",
+            fashion_image: req.body.fashion_image || "",
+            IdF,
+            slug: createFashionSlug(req.body.fashion_subject, IdF)
+        };
+        const result = await fashionCollection.insertOne(fashion);
+        res.status(201).send({ ...fashion, _id: result.insertedId });
     } catch (err) {
         res.status(500).send({ message: "Lỗi thêm dữ liệu!", error: err.message });
     }
@@ -116,11 +213,19 @@ app.post("/fashions", async (req, res) => {
 app.put("/fashions", async (req, res) => {
     try {
         const o_id = new ObjectId(req.body._id);
+        const existingFashion = await fashionCollection.findOne({ _id: o_id });
+        if (!existingFashion) {
+            return res.status(404).send({ message: "Không tìm thấy Fashion!" });
+        }
         const updateFields = {
-            style: req.body.style,
-            fashion_subject: req.body.fashion_subject,
-            fashion_detail: req.body.fashion_detail,
-            fashion_image: req.body.fashion_image
+            style: req.body.style ?? existingFashion.style,
+            fashion_subject: req.body.fashion_subject ?? existingFashion.fashion_subject,
+            fashion_detail: req.body.fashion_detail ?? existingFashion.fashion_detail,
+            fashion_image: req.body.fashion_image ?? existingFashion.fashion_image,
+            slug: createFashionSlug(
+                req.body.fashion_subject ?? existingFashion.fashion_subject,
+                existingFashion.IdF
+            )
         };
         await fashionCollection.updateOne({ _id: o_id }, { $set: updateFields });
         const result = await fashionCollection.findOne({ _id: o_id });
@@ -247,6 +352,13 @@ app.post('/api/logout', (req, res) => {
 // -------------------------------------------------------------
 // 5. KHỞI CHẠY SERVER
 // -------------------------------------------------------------
-app.listen(port, () => {
-    console.log(`My Server listening on port ${port}`);
-});
+initDB()
+    .then(() => {
+        app.listen(port, () => {
+            console.log(`My Server listening on port ${port}`);
+        });
+    })
+    .catch(err => {
+        console.error("Không thể khởi động server Fashion:", err);
+        process.exitCode = 1;
+    });
